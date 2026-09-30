@@ -1,5 +1,6 @@
 import { GameBoard } from "./components/GameBoard";
 import { GameHeader } from "./components/GameHeader";
+import { GameModeSelector } from "./components/GameModeSelector";
 import { HistoryPanel } from "./components/HistoryPanel";
 import { useTypingGame } from "./hooks/useTypingGame";
 
@@ -13,13 +14,22 @@ function App() {
       <div className="app-layout">
         <section className="game-column">
           <GameHeader game={game} />
+          <GameModeSelector
+            mode={game.mode}
+            setMode={game.setMode}
+            status={game.status}
+          />
           <GameBoard game={game} />
           <p className="keyboard-hint mb-2">
             Type the falling words before they reach the red line. Press{" "}
             <kbd>Enter</kbd> to start.
           </p>
         </section>
-        <HistoryPanel history={game.history} onClear={game.clearHistory} />
+        <HistoryPanel
+          history={game.history}
+          mode={game.mode}
+          onClear={game.clearHistory}
+        />
       </div>
     </main>
   );

@@ -1,4 +1,5 @@
 export type GameStatus = "idle" | "playing" | "paused" | "over";
+export type GameMode = "classic" | "endless";
 export type WordBankStatus = "loading" | "online" | "local";
 
 export type FallingWord = {
@@ -19,6 +20,7 @@ export type GameStats = {
 export type HistoryEntry = GameStats & {
   id: string;
   playedAt: string;
+  mode: GameMode;
   wordsCompleted: number;
 };
 
@@ -31,8 +33,11 @@ export type GameApi = {
   accuracy: number;
   wpm: number;
   wordBankStatus: WordBankStatus;
+  mode: GameMode;
   celebrationVisible: boolean;
+  setMode: (mode: GameMode) => void;
   start: () => void;
+  endGame: () => void;
   togglePause: () => void;
   dismissCelebration: () => void;
   history: HistoryEntry[];

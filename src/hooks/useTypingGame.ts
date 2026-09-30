@@ -10,6 +10,7 @@ import type {
   FallingWord,
   GameApi,
   GameStats,
+  GameMode,
   HistoryEntry,
   WordBankStatus,
 } from "../types/game";
@@ -21,6 +22,7 @@ const CELEBRATION_MILESTONES = [10, 20, 40];
 let nextWordId = 0;
 
 type MutableGame = GameStats & {
+  mode: GameMode;
   words: FallingWord[];
   targetId: number | null;
   typed: string;
@@ -28,7 +30,8 @@ type MutableGame = GameStats & {
   spawnTimer: number;
 };
 
-const createGame = (): MutableGame => ({
+const createGame = (mode: GameMode = "classic"): MutableGame => ({
+  mode,
   words: [],
   targetId: null,
   typed: "",
@@ -44,7 +47,11 @@ const createGame = (): MutableGame => ({
 const loadHistory = (): HistoryEntry[] => {
   try {
     const saved = localStorage.getItem(HISTORY_KEY);
-    return saved ? JSON.parse(saved) : [];
+    const entries = saved ? (JSON.parse(saved) as HistoryEntry[]) : [];
+    return entries.map((entry) => ({
+      ...entry,
+      mode: entry.mode ?? "classic",
+    }));
   } catch {
     return [];
   }
@@ -78,6 +85,7 @@ const getSnapshot = (
 export function useTypingGame(): GameApi {
   const gameRef = useRef(createGame());
   const [status, setStatus] = useState<GameApi["status"]>("idle");
+  const [mode, setModeState] = useState<GameMode>("classic");
   const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
   const [view, setView] = useState(() => getSnapshot(createGame()));
   const [wordBank, setWordBank] = useState(WORDS);
@@ -106,6 +114,7 @@ export function useTypingGame(): GameApi {
     const entry: HistoryEntry = {
       id: `${Date.now()}-${Math.random()}`,
       playedAt: new Date().toISOString(),
+      mode: game.mode,
       score: game.score,
       lives: game.lives,
       correctKeys: game.correctKeys,
@@ -114,20 +123,33 @@ export function useTypingGame(): GameApi {
       wordsCompleted: game.wordsCompleted,
     };
     setHistory((current) => {
-      const next = [entry, ...current].slice(0, 8);
+      const next = [entry, ...current].slice(0, 16);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
       return next;
     });
     setStatus("over");
   };
 
+  const setMode = (nextMode: GameMode) => {
+    if (status === "playing" || status === "paused") return;
+    setModeState(nextMode);
+  };
+
   const start = () => {
-    const newGame = createGame();
+    const newGame = createGame(mode);
     gameRef.current = newGame;
     setCelebrationVisible(false);
     setView(getSnapshot(newGame));
     setStatus("playing");
   };
+
+  const endGame = () => {
+    if (status !== "playing" && status !== "paused") return;
+    setView(getSnapshot(gameRef.current));
+    finishGame();
+  };
+
+  const currentHistory = history.filter((entry) => entry.mode === mode);
 
   useEffect(() => {
     if (!celebrationVisible) return undefined;
@@ -156,8 +178,8 @@ export function useTypingGame(): GameApi {
       lastTime = now;
       const game = gameRef.current;
       game.elapsed += delta;
-      const speed = 42 + game.elapsed * 1.5;
-      const interval = Math.max(0.62, 1.7 - game.elapsed * 0.018);
+      const speed = 36 + game.elapsed * 0.9;
+      const interval = Math.max(0.9, 2.1 - game.elapsed * 0.012);
       game.spawnTimer -= delta;
       if (game.spawnTimer <= 0) {
         spawnWord(game, wordBank);
@@ -170,7 +192,7 @@ export function useTypingGame(): GameApi {
       const fallen = game.words.filter((word) => word.y > BOARD_HEIGHT - 48);
       if (fallen.length > 0) {
         playFailureSound();
-        game.lives -= fallen.length;
+        if (game.mode === "classic") game.lives -= fallen.length;
         if (fallen.some((word) => word.id === game.targetId)) {
           game.targetId = null;
           game.typed = "";
@@ -178,7 +200,7 @@ export function useTypingGame(): GameApi {
         game.words = game.words.filter((word) => word.y <= BOARD_HEIGHT - 48);
       }
 
-      if (game.lives <= 0) {
+      if (game.mode === "classic" && game.lives <= 0) {
         game.lives = 0;
         setView(getSnapshot(game));
         finishGame();
@@ -280,14 +302,20 @@ export function useTypingGame(): GameApi {
     accuracy,
     wpm,
     wordBankStatus,
+    mode,
+    setMode,
     celebrationVisible,
     start,
+    endGame,
     togglePause,
     dismissCelebration: () => setCelebrationVisible(false),
-    history,
+    history: currentHistory,
     clearHistory: () => {
-      localStorage.removeItem(HISTORY_KEY);
-      setHistory([]);
+      setHistory((current) => {
+        const next = current.filter((entry) => entry.mode !== mode);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+        return next;
+      });
     },
   };
 }

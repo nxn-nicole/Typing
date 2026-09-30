@@ -11,26 +11,37 @@ export function GameBoard({ game }: Props) {
           LEVEL {Math.min(9, Math.floor(game.stats.elapsed / 12) + 1)}
         </span>
         <div className="board-controls">
-          <span className="lives" aria-label={`${game.stats.lives} lives`}>
-            {Array.from({ length: 5 }, (_, index) => (
-              <span
-                key={index}
-                className={index < game.stats.lives ? "life active" : "life"}
-              >
-                <span className="pixel-heart" aria-hidden="true" />
-              </span>
-            ))}
-          </span>
+          {game.mode === "classic" && (
+            <span className="lives" aria-label={`${game.stats.lives} lives`}>
+              {Array.from({ length: 5 }, (_, index) => (
+                <span
+                  key={index}
+                  className={index < game.stats.lives ? "life active" : "life"}
+                >
+                  <span className="pixel-heart" aria-hidden="true" />
+                </span>
+              ))}
+            </span>
+          )}
           {(game.status === "playing" || game.status === "paused") && (
             <button
               type="button"
-              className="pause-button mt-2 ml-2"
+              className="pause-button"
               onClick={game.togglePause}
               aria-label={
                 game.status === "paused" ? "Resume game" : "Pause game"
               }
             >
               {game.status === "paused" ? "RESUME" : "PAUSE"}
+            </button>
+          )}
+          {game.mode === "endless" && game.status === "playing" && (
+            <button
+              type="button"
+              className="pause-button"
+              onClick={game.endGame}
+            >
+              END RUN
             </button>
           )}
         </div>

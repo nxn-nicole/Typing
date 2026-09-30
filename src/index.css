@@ -78,6 +78,35 @@ button {
 .game-header {
   margin-bottom: 28px;
 }
+.mode-selector {
+  display: inline-flex;
+  margin-bottom: 18px;
+  border: 1px solid #465047;
+}
+.mode-button {
+  cursor: pointer;
+  border: 0;
+  border-right: 1px solid #465047;
+  padding: 7px 11px;
+  background: transparent;
+  color: #7f897f;
+  font:
+    9px "DM Mono",
+    monospace;
+  letter-spacing: 0.08em;
+}
+.mode-button:last-child {
+  border-right: 0;
+}
+.mode-button:hover:not(:disabled),
+.mode-button.active {
+  background: #f2c95c;
+  color: #263029;
+}
+.mode-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
 .eyebrow,
 .score-label,
 .board-topline,

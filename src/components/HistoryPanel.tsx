@@ -1,6 +1,6 @@
-import type { HistoryEntry } from "../types/game";
+import type { GameMode, HistoryEntry } from "../types/game";
 
-type Props = { history: HistoryEntry[]; onClear: () => void };
+type Props = { history: HistoryEntry[]; mode: GameMode; onClear: () => void };
 
 const formatDate = (date: string) =>
   new Intl.DateTimeFormat("en", {
@@ -10,13 +10,13 @@ const formatDate = (date: string) =>
     minute: "2-digit",
   }).format(new Date(date));
 
-export function HistoryPanel({ history, onClear }: Props) {
+export function HistoryPanel({ history, mode, onClear }: Props) {
   return (
     <aside className="history-panel">
       <div className="panel-heading">
         <div>
           <p className="eyebrow">LOCAL MEMORY</p>
-          <h2>Recent runs</h2>
+          <h2>{mode === "endless" ? "Endless runs" : "Classic runs"}</h2>
         </div>
         {history.length > 0 && (
           <button type="button" className="clear-button" onClick={onClear}>
