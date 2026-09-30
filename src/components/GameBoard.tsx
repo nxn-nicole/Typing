@@ -103,19 +103,13 @@ export function GameBoard({ game }: Props) {
       )}
       {game.celebrationVisible && (
         <div className="celebration-popup" role="dialog" aria-live="polite">
-          <div className="celebration-spark" aria-hidden="true">
-            ♥
+          <div className="celebration-label">
+            <span className="overlay-kicker">NICE WORK</span>
+            <span className="celebration-spark" aria-hidden="true">
+              ♥
+            </span>
           </div>
-          <span className="overlay-kicker">NICE WORK</span>
-          <h2>You have done a good job.</h2>
-          <p>You got a kiss from Nicole.</p>
-          <button
-            type="button"
-            className="celebration-button"
-            onClick={game.dismissCelebration}
-          >
-            THANK YOU
-          </button>
+          <h3>You got a kiss from Nicole.</h3>
         </div>
       )}
     </section>

@@ -134,7 +134,7 @@ export function useTypingGame(): GameApi {
 
     const timeout = window.setTimeout(() => {
       setCelebrationVisible(false);
-    }, 1000);
+    }, 2000);
     return () => window.clearTimeout(timeout);
   }, [celebrationVisible]);
 

@@ -194,10 +194,16 @@ h1 {
   animation: celebration-in 0.35s ease both;
 }
 .celebration-spark {
-  margin-bottom: 7px;
+  margin: 0;
   color: #e17b60;
   font-size: 22px;
   animation: heart-pulse 0.9s ease-in-out infinite alternate;
+}
+.celebration-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
 }
 .celebration-popup h2 {
   margin: 8px 0 7px;
