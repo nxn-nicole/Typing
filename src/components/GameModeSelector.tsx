@@ -5,10 +5,11 @@ type Props = Pick<GameApi, "mode" | "setMode" | "status">;
 const modes: { value: GameMode; label: string }[] = [
   { value: "classic", label: "CLASSIC" },
   { value: "endless", label: "ENDLESS" },
+  { value: "letter", label: "LETTER" },
 ];
 
 export function GameModeSelector({ mode, setMode, status }: Props) {
-  const disabled = status === "playing" || status === "paused";
+  const disabled = status === "playing";
 
   return (
     <div className="mode-selector" aria-label="Game mode">

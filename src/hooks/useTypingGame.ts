@@ -19,6 +19,7 @@ const BOARD_HEIGHT = 520;
 const MAX_LIVES = 5;
 const HISTORY_KEY = "typing-game-history";
 const CELEBRATION_MILESTONES = [10, 20, 40];
+const LETTERS = "abcdefghijklmnopqrstuvwxyz";
 let nextWordId = 0;
 
 type MutableGame = GameStats & {
@@ -41,7 +42,7 @@ const createGame = (mode: GameMode = "classic"): MutableGame => ({
   totalKeys: 0,
   elapsed: 0,
   wordsCompleted: 0,
-  spawnTimer: 0.3,
+  spawnTimer: mode === "letter" ? 0.8 : 0.3,
 });
 
 const loadHistory = (): HistoryEntry[] => {
@@ -58,7 +59,8 @@ const loadHistory = (): HistoryEntry[] => {
 };
 
 const spawnWord = (game: MutableGame, wordBank: string[]) => {
-  const text = wordBank[Math.floor(Math.random() * wordBank.length)];
+  const source = game.mode === "letter" ? LETTERS : wordBank;
+  const text = source[Math.floor(Math.random() * source.length)];
   game.words.push({
     id: nextWordId++,
     text,
@@ -131,8 +133,15 @@ export function useTypingGame(): GameApi {
   };
 
   const setMode = (nextMode: GameMode) => {
-    if (status === "playing" || status === "paused") return;
+    if (status === "playing" || nextMode === mode) return;
     setModeState(nextMode);
+    if (status === "paused") {
+      const newGame = createGame(nextMode);
+      gameRef.current = newGame;
+      setCelebrationVisible(false);
+      setView(getSnapshot(newGame));
+      setStatus("idle");
+    }
   };
 
   const start = () => {
@@ -178,8 +187,14 @@ export function useTypingGame(): GameApi {
       lastTime = now;
       const game = gameRef.current;
       game.elapsed += delta;
-      const speed = 36 + game.elapsed * 0.9;
-      const interval = Math.max(0.9, 2.1 - game.elapsed * 0.012);
+      const speed =
+        game.mode === "letter"
+          ? 100 + game.elapsed * 0.7
+          : 36 + game.elapsed * 0.5;
+      const interval =
+        game.mode === "letter"
+          ? Math.max(1.1, 2.5 - game.elapsed * 0.008)
+          : Math.max(0.9, 2.1 - game.elapsed * 0.012);
       game.spawnTimer -= delta;
       if (game.spawnTimer <= 0) {
         spawnWord(game, wordBank);
@@ -192,7 +207,7 @@ export function useTypingGame(): GameApi {
       const fallen = game.words.filter((word) => word.y > BOARD_HEIGHT - 48);
       if (fallen.length > 0) {
         playFailureSound();
-        if (game.mode === "classic") game.lives -= fallen.length;
+        if (game.mode !== "endless") game.lives -= fallen.length;
         if (fallen.some((word) => word.id === game.targetId)) {
           game.targetId = null;
           game.typed = "";
@@ -200,7 +215,7 @@ export function useTypingGame(): GameApi {
         game.words = game.words.filter((word) => word.y <= BOARD_HEIGHT - 48);
       }
 
-      if (game.mode === "classic" && game.lives <= 0) {
+      if (game.mode !== "endless" && game.lives <= 0) {
         game.lives = 0;
         setView(getSnapshot(game));
         finishGame();

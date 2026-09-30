@@ -16,7 +16,13 @@ export function HistoryPanel({ history, mode, onClear }: Props) {
       <div className="panel-heading">
         <div>
           <p className="eyebrow">LOCAL MEMORY</p>
-          <h2>{mode === "endless" ? "Endless runs" : "Classic runs"}</h2>
+          <h2>
+            {mode === "endless"
+              ? "Endless runs"
+              : mode === "letter"
+                ? "Letter runs"
+                : "Classic runs"}
+          </h2>
         </div>
         {history.length > 0 && (
           <button type="button" className="clear-button" onClick={onClear}>

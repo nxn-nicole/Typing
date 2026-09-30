@@ -6,6 +6,7 @@ const CACHE_TTL = 24 * 60 * 60 * 1000;
 const RELATED_TOPICS = [
   "game",
   "space",
+  "fantasy",
   "learning",
   "accounting",
   "finance",

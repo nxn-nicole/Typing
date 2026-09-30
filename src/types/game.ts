@@ -1,5 +1,5 @@
 export type GameStatus = "idle" | "playing" | "paused" | "over";
-export type GameMode = "classic" | "endless";
+export type GameMode = "classic" | "endless" | "letter";
 export type WordBankStatus = "loading" | "online" | "local";
 
 export type FallingWord = {

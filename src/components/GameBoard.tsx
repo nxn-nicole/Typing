@@ -11,7 +11,7 @@ export function GameBoard({ game }: Props) {
           LEVEL {Math.min(9, Math.floor(game.stats.elapsed / 12) + 1)}
         </span>
         <div className="board-controls">
-          {game.mode === "classic" && (
+          {game.mode !== "endless" && (
             <span className="lives" aria-label={`${game.stats.lives} lives`}>
               {Array.from({ length: 5 }, (_, index) => (
                 <span
@@ -76,7 +76,9 @@ export function GameBoard({ game }: Props) {
             <h2>
               {game.status === "over"
                 ? "Keep the rhythm."
-                : "Catch every word."}
+                : game.mode === "letter"
+                  ? "Catch every letter."
+                  : "Catch every word."}
             </h2>
             {game.status === "over" ? (
               <p className="pb-2">
@@ -104,10 +106,10 @@ export function GameBoard({ game }: Props) {
             <p className="pb-2">Your run is waiting right where you left it.</p>
             <button
               type="button"
-              className="start-button"
+              className="start-button my-2"
               onClick={game.togglePause}
             >
-              RESUME GAME <span>-&gt;</span>
+              RESUME GAME
             </button>
           </div>
         </div>
