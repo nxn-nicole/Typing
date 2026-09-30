@@ -75,9 +75,12 @@ export function GameBoard({ game }: Props) {
             ) : (
               <p>Type the highlighted word before it crosses the line.</p>
             )}
-            <button type="button" className="start-button" onClick={game.start}>
+            <button
+              type="button"
+              className="start-button mt-3"
+              onClick={game.start}
+            >
               {game.status === "over" ? "PLAY AGAIN" : "START GAME"}{" "}
-              <span>-&gt;</span>
             </button>
           </div>
         </div>
@@ -96,6 +99,23 @@ export function GameBoard({ game }: Props) {
               RESUME GAME <span>-&gt;</span>
             </button>
           </div>
+        </div>
+      )}
+      {game.celebrationVisible && (
+        <div className="celebration-popup" role="dialog" aria-live="polite">
+          <div className="celebration-spark" aria-hidden="true">
+            ♥
+          </div>
+          <span className="overlay-kicker">NICE WORK</span>
+          <h2>You have done a good job.</h2>
+          <p>You got a kiss from Nicole.</p>
+          <button
+            type="button"
+            className="celebration-button"
+            onClick={game.dismissCelebration}
+          >
+            THANK YOU
+          </button>
         </div>
       )}
     </section>

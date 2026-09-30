@@ -180,6 +180,51 @@ h1 {
   border-color: #f2c95c;
   color: #f2c95c;
 }
+.celebration-popup {
+  position: fixed;
+  z-index: 10;
+  top: 24px;
+  right: 24px;
+  width: min(280px, calc(100% - 48px));
+  padding: 18px 17px 16px;
+  border: 1px solid #f2c95c;
+  background: #263029;
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.28);
+  text-align: center;
+  animation: celebration-in 0.35s ease both;
+}
+.celebration-spark {
+  margin-bottom: 7px;
+  color: #e17b60;
+  font-size: 22px;
+  animation: heart-pulse 0.9s ease-in-out infinite alternate;
+}
+.celebration-popup h2 {
+  margin: 8px 0 7px;
+  color: #f4f1e8;
+  font-size: 1.25rem;
+  line-height: 1.05;
+}
+.celebration-popup p {
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: #c3cec0;
+}
+.celebration-button {
+  cursor: pointer;
+  border: 1px solid #f2c95c;
+  padding: 7px 10px;
+  background: transparent;
+  color: #f2c95c;
+  font:
+    10px "DM Mono",
+    monospace;
+  letter-spacing: 0.08em;
+}
+.celebration-button:hover {
+  background: #f2c95c;
+  color: #263029;
+}
 .pixel-heart {
   display: inline-block;
   width: 4px;
@@ -399,6 +444,24 @@ kbd {
     transform: translateY(0);
   }
 }
+@keyframes celebration-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes heart-pulse {
+  from {
+    transform: scale(0.9) rotate(-5deg);
+  }
+  to {
+    transform: scale(1.12) rotate(5deg);
+  }
+}
 @media (max-width: 850px) {
   .app-layout {
     grid-template-columns: 1fr;
@@ -424,5 +487,10 @@ kbd {
   }
   .falling-word {
     font-size: 16px;
+  }
+  .celebration-popup {
+    top: 14px;
+    right: 14px;
+    width: calc(100% - 28px);
   }
 }

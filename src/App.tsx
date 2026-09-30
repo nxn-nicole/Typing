@@ -14,7 +14,7 @@ function App() {
         <section className="game-column">
           <GameHeader game={game} />
           <GameBoard game={game} />
-          <p className="keyboard-hint">
+          <p className="keyboard-hint mb-2">
             Type the falling words before they reach the red line. Press{" "}
             <kbd>Enter</kbd> to start.
           </p>

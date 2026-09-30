@@ -31,8 +31,10 @@ export type GameApi = {
   accuracy: number;
   wpm: number;
   wordBankStatus: WordBankStatus;
+  celebrationVisible: boolean;
   start: () => void;
   togglePause: () => void;
+  dismissCelebration: () => void;
   history: HistoryEntry[];
   clearHistory: () => void;
 };

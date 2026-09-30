@@ -17,6 +17,7 @@ import type {
 const BOARD_HEIGHT = 520;
 const MAX_LIVES = 5;
 const HISTORY_KEY = "typing-game-history";
+const CELEBRATION_MILESTONES = [10, 20, 40];
 let nextWordId = 0;
 
 type MutableGame = GameStats & {
@@ -82,6 +83,7 @@ export function useTypingGame(): GameApi {
   const [wordBank, setWordBank] = useState(WORDS);
   const [wordBankStatus, setWordBankStatus] =
     useState<WordBankStatus>("loading");
+  const [celebrationVisible, setCelebrationVisible] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -122,9 +124,19 @@ export function useTypingGame(): GameApi {
   const start = () => {
     const newGame = createGame();
     gameRef.current = newGame;
+    setCelebrationVisible(false);
     setView(getSnapshot(newGame));
     setStatus("playing");
   };
+
+  useEffect(() => {
+    if (!celebrationVisible) return undefined;
+
+    const timeout = window.setTimeout(() => {
+      setCelebrationVisible(false);
+    }, 1000);
+    return () => window.clearTimeout(timeout);
+  }, [celebrationVisible]);
 
   const togglePause = () => {
     setStatus((current) => {
@@ -235,6 +247,9 @@ export function useTypingGame(): GameApi {
       if (game.typed === target.text) {
         game.score += target.text.length * 10;
         game.wordsCompleted += 1;
+        if (CELEBRATION_MILESTONES.includes(game.wordsCompleted)) {
+          setCelebrationVisible(true);
+        }
         playCompleteSound();
         game.words = game.words.filter((word) => word.id !== target.id);
         game.targetId = null;
@@ -265,8 +280,10 @@ export function useTypingGame(): GameApi {
     accuracy,
     wpm,
     wordBankStatus,
+    celebrationVisible,
     start,
     togglePause,
+    dismissCelebration: () => setCelebrationVisible(false),
     history,
     clearHistory: () => {
       localStorage.removeItem(HISTORY_KEY);
