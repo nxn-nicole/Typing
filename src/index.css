@@ -14,12 +14,14 @@
 body {
   margin: 0;
   min-width: 320px;
+  height: 100vh;
+  overflow: hidden;
 }
 button {
   font: inherit;
 }
 .app-shell {
-  min-height: 100vh;
+  height: 100dvh;
   position: relative;
   overflow: hidden;
   background: #151715;
@@ -56,6 +58,8 @@ button {
 .app-layout {
   position: relative;
   display: grid;
+  height: 100%;
+  min-height: 0;
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 28px;
   width: min(1180px, calc(100% - 48px));
@@ -356,11 +360,13 @@ kbd {
 }
 .history-panel {
   align-self: start;
-  min-height: 310px;
+  height: calc(100% - 81px);
+  min-height: 0;
   margin-top: 81px;
   padding: 24px;
   border: 1px solid #39423b;
   background: rgba(29, 34, 30, 0.7);
+  overflow-y: auto;
 }
 .panel-heading {
   align-items: flex-start;
@@ -475,6 +481,7 @@ kbd {
   }
   .history-panel {
     margin-top: 0;
+    height: 260px;
   }
 }
 @media (max-width: 520px) {

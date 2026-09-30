@@ -1,7 +1,7 @@
 import { WORDS } from "../data/words";
 
 const API_URL = "https://api.datamuse.com/words";
-const CACHE_KEY = "typing-game-word-bank-v2";
+const CACHE_KEY = "typing-game-word-bank-v3";
 const CACHE_TTL = 24 * 60 * 60 * 1000;
 const RELATED_TOPICS = [
   "game",
@@ -22,7 +22,7 @@ const cleanWords = (words: string[]) =>
   Array.from(
     new Set(
       words
-        .map((word) => word.toLowerCase().trim())
+        .map((word) => singularize(word.toLowerCase().trim()))
         .filter(
           (word) =>
             /^[a-z]+$/.test(word) && word.length >= 3 && word.length <= 10,
@@ -30,12 +30,23 @@ const cleanWords = (words: string[]) =>
     ),
   );
 
+const singularize = (word: string) => {
+  if (word.endsWith("ies") && word.length > 4) return `${word.slice(0, -3)}y`;
+  if (/(ches|shes|xes|zes|ses)$/.test(word)) return word.slice(0, -2);
+  if (word.endsWith("s") && !/(ss|us|is|ous)$/.test(word)) {
+    return word.slice(0, -1);
+  }
+  return word;
+};
+
 const readCache = () => {
   try {
     const cached = JSON.parse(
       localStorage.getItem(CACHE_KEY) ?? "null",
     ) as CachedWordBank | null;
-    if (cached && Date.now() - cached.savedAt < CACHE_TTL) return cached.words;
+    if (cached && Date.now() - cached.savedAt < CACHE_TTL) {
+      return cleanWords(cached.words);
+    }
   } catch {
     return null;
   }
