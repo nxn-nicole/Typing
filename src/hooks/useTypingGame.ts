@@ -120,7 +120,9 @@ export function useTypingGame(): GameApi {
   };
 
   const start = () => {
-    gameRef.current = createGame();
+    const newGame = createGame();
+    gameRef.current = newGame;
+    setView(getSnapshot(newGame));
     setStatus("playing");
   };
 
@@ -205,33 +207,38 @@ export function useTypingGame(): GameApi {
 
       const letter = event.key.toLowerCase();
       game.totalKeys += 1;
-      let target = game.words.find((word) => word.id === game.targetId);
-      if (!target) {
-        target = game.words
-          .filter((word) => word.text[0] === letter)
-          .sort((first, second) => second.y - first.y)[0];
-        if (!target) {
-          playFailureSound();
-          return;
-        }
-        game.targetId = target.id;
-        game.typed = "";
+      let nextTyped = `${game.typed}${letter}`;
+      let candidates = game.words
+        .filter((word) => word.text.startsWith(nextTyped))
+        .sort((first, second) => second.y - first.y);
+
+      if (candidates.length === 0 && game.typed) {
+        nextTyped = letter;
+        candidates = game.words
+          .filter((word) => word.text.startsWith(nextTyped))
+          .sort((first, second) => second.y - first.y);
       }
 
-      if (target.text[game.typed.length] === letter) {
-        game.typed += letter;
-        game.correctKeys += 1;
-        playCorrectSound();
-        if (game.typed === target.text) {
-          game.score += target.text.length * 10;
-          game.wordsCompleted += 1;
-          playCompleteSound();
-          game.words = game.words.filter((word) => word.id !== target?.id);
-          game.targetId = null;
-          game.typed = "";
-        }
-      } else {
+      const target = candidates[0];
+      if (!target) {
         playFailureSound();
+        game.targetId = null;
+        game.typed = "";
+        setView(getSnapshot(game));
+        return;
+      }
+
+      game.targetId = target.id;
+      game.typed = nextTyped;
+      game.correctKeys += 1;
+      playCorrectSound();
+      if (game.typed === target.text) {
+        game.score += target.text.length * 10;
+        game.wordsCompleted += 1;
+        playCompleteSound();
+        game.words = game.words.filter((word) => word.id !== target.id);
+        game.targetId = null;
+        game.typed = "";
       }
       setView(getSnapshot(game));
     };
